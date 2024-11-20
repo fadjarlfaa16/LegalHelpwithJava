@@ -12,48 +12,101 @@ public class Admin extends User{
     public List<ConsultantService> lawyers;
     public List<Article> articles;
 
-    public Admin(String idAdmin, String passAdmin, List<User> users, String idUser, String passUser, String emailUser) {
+    public Admin(String idUser, String passUser, String emailUser) {
         super(idUser, passUser, emailUser);
-        this.idAdmin = idAdmin;
-        this.passAdmin = passAdmin;
         this.users = new ArrayList<>();
         this.transaksi = new ArrayList<>();
         this.lawyers = new ArrayList<>();
         this.articles = new ArrayList<>();
     }
-
-    
-    
-    public void manageUser(){
-        User newUser = new User("user123", "password123", "user123@gmail.com"){
-            @Override
-            public void register(String idUser, String emailUser, String password){
-                System.out.println("Registering User "+ idUser);
-            }
-        };
-        addUser(newUser);
-        
-        System.out.println("List of users:");
-        for (User user : users) {
-            System.out.println(user.idUser + " - " + user.emailUser);
-        }
-        
-        removeUser("user123");
-        
-        System.out.println("List of users after removal:");
-        for (User user : users) {
-            System.out.println(user.idUser + " - " + user.emailUser);
-        }
-    }    
     
     public void addUser(User user) {
         users.add(user);
-        System.out.println("User added: " + user.idUser);
     }
+    
+    public void manageUser(){
+        Scanner scanner = new Scanner(System.in);
+        int choice;
         
+       do{
+            System.out.println("\n ===Mengelola User=== ");
+            System.out.println("1. Menambahkan User ");
+            System.out.println("2. Menghapus User");
+            System.out.println("3. Melihat User");
+            System.out.println("4. Exit");
+            System.out.print("Masukkan Pilihan Anda: ");
+            choice = scanner.nextInt();
+            scanner.nextLine();
+            
+            switch (choice){
+                case 1:
+                    System.out.print("Masukkan Nama Pengguna: ");
+                    String user = scanner.nextLine();
+        
+                    System.out.print("Masukkan Password: ");
+                    String pass = scanner.nextLine();
+
+                    System.out.print("Masukkan email: ");
+                    String email = scanner.nextLine();
+
+                    User newUser = new User(user, email, pass) {
+                        @Override
+                        public void register(String idUser, String emailUser, String password) {
+                            System.out.println("Registering User "+ idUser); 
+                        }
+                    };
+                    newUser.register(idUser, emailUser, pass);
+                    users.add(newUser);
+
+                    System.out.println("Penambahan Pengguna Berhasil!");
+                    break;
+                    
+                    
+                case 2:
+                    System.out.print("Masukkan Nama Pengguna yang akan dihapus: ");
+                    String userId = scanner.nextLine();
+                    removeUser(userId);
+                    break;
+                
+                case 3:
+                    if (users.isEmpty()) {
+                        System.out.println("Pengguna Tidak Tersedia");
+                    } else {
+                        System.out.println("=== List Pengguna ===");
+                        for (User us : users) {
+                            System.out.println(us);
+                        }   
+                    }
+                    break;
+                    
+                case 4:
+                    System.out.println("Keluar Dari Manajemen Pengguna");
+                    break;
+                    
+                default:
+                    System.out.println("Pilihan Tidak Valid. Silahkan Coba Lagi");
+            }
+        }
+        while (choice != 4);
+        
+    } 
+    
     public void removeUser(String userId) {
-        users.removeIf(user -> user.idUser.equals(userId));
-        System.out.println("User with ID " + userId + " removed.");
+        boolean userFound = false;
+
+        // Menghapus pengguna berdasarkan ID
+        for (User us : users) {
+            if (us.idUser.equals(userId)) {
+                users.remove(us);
+                System.out.println("Pengguna dengan Nama " + userId + " telah dihapus.");
+                userFound = true;
+                break;
+            }
+        }
+
+        if (!userFound) {
+            System.out.println("Pengguna dengan Nama " + userId + " tidak ditemukan.");
+        }
     }
     
     public void monitorTransaction(){
@@ -163,15 +216,93 @@ public class Admin extends User{
                         System.out.println("Tidak Ada Pengacara yang di Hapus");
                     }else {
                         System.out.println("Pilih Pengacara untuk Dihapus");
+                        for (int i = 0 ; i<lawyers.size(); i++){
+                            System.out.println((i+1) + ". " + lawyers.get(i).getLawyerName());
+                        }
+                        System.out.print("Masukkan nomor pengacara yang dihapus: ");
+                        int lawyerIndex = scanner.nextInt() - 1;
+                        
+                        if (lawyerIndex >=0 && lawyerIndex < lawyers.size()){
+                            System.out.println("Hapus Pengacara: " + lawyers.remove(lawyerIndex).getLawyerName());
+                        }else {
+                            System.out.println("Pilihan Tidak Valid");
+                        }
                     }
+                    break;
+                
+                case 3:
+                    displaylawyer();
+                    break;
+                    
+                case 4:
+                    System.out.println("Keluar Dari Manajemen Pengacara");
+                    break;
+                    
+                default:
+                    System.out.println("Pilihan Tidak Valid. Silahkan Coba Lagi");
             }
         }
+        while (choice != 4);
+    }
+    
+    public void manageArticle(){
+        Scanner scanner = new Scanner(System.in);
+        int choice;
+        
+        do{
+            System.out.println("\n ===Mengelola Article=== ");
+            System.out.println("1. Menambahkan Article ");
+            System.out.println("2. Menghapus Article");
+            System.out.println("3. Melihat Article");
+            System.out.println("4. Exit");
+            System.out.print("Masukkan Pilihan Anda: ");
+            choice = scanner.nextInt();
+            scanner.nextLine();
+            
+            switch (choice){
+                case 1:
+                    addArticle();
+                    break;
+                case 2:
+                    if(articles.isEmpty()){
+                        System.out.println("Tidak Ada Pengacara yang di Hapus");
+                    }else {
+                        System.out.println("Pilih Pengacara untuk Dihapus");
+                        for (int i = 0 ; i<articles.size(); i++){
+                            System.out.println((i+1) + ". " + articles.get(i).getTitleArticle());
+                        }
+                        System.out.print("Masukkan nomor pengacara yang dihapus: ");
+                        int articleIndex = scanner.nextInt() - 1;
+                        
+                        if (articleIndex >=0 && articleIndex < articles.size()){
+                            System.out.println("Hapus Pengacara: " + articles.remove(articleIndex).getTitleArticle());
+                        }else {
+                            System.out.println("Pilihan Tidak Valid");
+                        }
+                    }
+                    break;
+                
+                case 3:
+                    diplayArticles();
+                    break;
+                    
+                case 4:
+                    System.out.println("Keluar Dari Manajemen Artikel");
+                    break;
+                    
+                default:
+                    System.out.println("Pilihan Tidak Valid. Silahkan Coba Lagi");
+            }
+        }
+        while (choice != 4);
     }
 
     @Override
     public void register(String idUser, String emailUser, String password) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        throw new UnsupportedOperationException("Not supported yet."); 
     }
+
+    
 
     
 }
